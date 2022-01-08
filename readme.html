@@ -1,0 +1,42 @@
+docker-compose exec gnmn-kafka /opt/bitnami/kafka/bin/kafka-topics.sh \
+  --create \
+  --bootstrap-server localhost:9092 \
+  --replication-factor 1 \
+  --partitions 1 \
+  --topic message-log
+
+
+  docker-compose exec gnmn-kafka ls /opt/bitnami/kafka/bin
+
+
+ ./kafka-topics.sh --create --topic comments --replication-factor 1 --partitions 1  --zookeeper zookeeper:2181
+
+
+./kafka-topics.sh --list --zookeeper zookeeper:2181
+comments
+
+
+curl --location --request POST '0.0.0.0:3000/api/v1/comments' \
+--header 'Content-Type: application/json' \
+--data-raw '{ "text":"nice boy" }'
+
+curl --location --request POST 'localhost:3000/api/v1/comments' \
+--header 'Content-Type: application/json' \
+--data-raw '{ "text":"keep up the good work-3" }'
+
+go build -o producer/producer producer/producer.go
+
+go build -o consumer/consumer consumer/consumer.go
+
+
+
+docker build . -t producer
+docker run -d -p 3000:3000 producer
+
+docker build -t consumer -f DockerfileConsumer .
+
+docker run consumer
+
+
+credit : https://github.com/zaynkorai/go-kafka-example
+
